@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <title>CjChatBot — Multistream Live Chat</title>
+    <meta name="description"
+        content="Bring Twitch, YouTube, Kick and TikTok live chats together in one customizable feed.">
+    <meta name="keywords"
+        content="multistream chat, combined chat, chat aggregator, twitch chat, youtube live chat, kick chat, tiktok live chat, obs chat overlay, multi chat viewer, unified chat, 7tv emotes, bttv emotes, ffz emotes, streamelements alerts, hype train, twitch badges, chat widget, dual stream chat">
+    <meta name="author" content="Cjhackeryt">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph (Facebook, Discord, Slack, ...) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CjChatBot">
+    <meta property="og:title" content="CjChatBot — Multistream Live Chat">
+    <meta property="og:description"
+        content="Bring Twitch, YouTube, Kick and TikTok live chats together in one customizable feed.">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="CjChatBot — Multistream Live Chat">
+    <meta name="twitter:description"
+        content="Bring Twitch, YouTube, Kick and TikTok live chats together in one customizable feed.">
+
+    <link rel="icon" type="image/svg+xml" href="assets/cjchatbot-mark.svg">
+    <link rel="icon" href="assets/favicon.ico" sizes="any">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="stylesheet" href="styles.css?v=20261015-obs-copy">
+    <script>
+        if ((new URLSearchParams(location.search).get("expand") ?? "0") !== "0") document.documentElement.classList.add("expand-mode");
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "CjChatBot",
+        "description": "Free multistream chat viewer that combines Twitch, YouTube, Kick and TikTok live chats in one unified feed, with 7TV/BTTV/FFZ emotes, stream player, alert sounds and a transparent OBS chat overlay.",
+        "applicationCategory": "EntertainmentApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "featureList": [
+            "Combined live chat for Twitch, YouTube, Kick and TikTok",
+            "7TV, BTTV and FFZ emotes",
+            "Twitch badges and animated cheermotes",
+            "Hype train progress bar",
+            "Embedded stream player (Twitch, Kick, YouTube)",
+            "StreamElements/Streamlabs alert sounds",
+            "Transparent OBS chat overlay with auto-fading messages",
+            "Expandable full-window chat, shareable links, installable as an app (PWA)"
+        ],
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "creator": {
+            "@type": "Person",
+            "name": "Cjhackeryt"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Cjhackeryt"
+        }
+    }
+    </script>
+</head>
+<body data-mode="main">
+    <div class="app-shell">
+        <button id="alerts-unlock" class="alerts-unlock hidden" type="button"
+            title="Browsers block sound until you interact with the page">&#128266; Enable alert sound</button>
+        <div id="player-pane" class="player-pane hidden">
+            <div id="player-frame" class="player-frame"></div>
+        </div>
+        <main class="layout-grid">
+            <header class="hero">
+                <div class="brand-lockup">
+                    <img src="assets/cjchatbot-mark.svg" class="header-logo" alt="">
+                    <div class="brand-copy">
+                        <span class="brand-eyebrow">YOUR CREATOR CONTROL ROOM</span>
+                        <h1>CjChatBot</h1>
+                        <span class="brand-owner">A MULTI-PLATFORM CHAT DESK BY CJHACKERYT</span>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <span class="local-badge"><span></span> LOCAL SESSION</span>
+                    <button id="open-info" class="guide-button" type="button"
+                        title="How CjChatBot works">&#9432; Quick guide</button>
+                </div>
+            </header>
+
+            <div class="side-column">
+            <section class="panel channels-panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-kicker">01 / INPUT</span>
+                        <h2>Connect channels</h2>
+                    </div>
+                    <span class="channel-capacity">UP TO 4</span>
+                </div>
+                <form id="channels-form" class="channels-form">
+                    <div class="channel-field" data-platform="twitch">
+                        <span class="channel-label">Twitch</span>
+                        <input id="channel-twitch" class="input-field channel-input" type="text"
+                            placeholder="channel name" autocomplete="off" spellcheck="false">
+                        <button id="clear-twitch" class="channel-clear hidden" type="button"
+                            title="Disconnect Twitch">&#x2715;</button>
+                    </div>
+                    <div class="channel-field" data-platform="youtube">
+                        <span class="channel-label">YouTube</span>
+                        <input id="channel-youtube" class="input-field channel-input" type="text"
+                            placeholder="handle" autocomplete="off" spellcheck="false">
+                        <button id="clear-youtube" class="channel-clear hidden" type="button"
+                            title="Disconnect YouTube">&#x2715;</button>
+                    </div>
+                    <div class="channel-field" data-platform="kick">
+                        <span class="channel-label">Kick</span>
+                        <input id="channel-kick" class="input-field channel-input" type="text"
+                            placeholder="channel name" autocomplete="off" spellcheck="false">
+                        <button id="clear-kick" class="channel-clear hidden" type="button"
+                            title="Disconnect Kick">&#x2715;</button>
+                    </div>
+                    <div class="channel-field" data-platform="tiktok">
+                        <span class="channel-label">TikTok</span>
+                        <input id="channel-tiktok" class="input-field channel-input" type="text"
+                            placeholder="username" autocomplete="off" spellcheck="false">
+                        <button id="clear-tiktok" class="channel-clear hidden" type="button"
+                            title="Disconnect TikTok">&#x2715;</button>
+                    </div>
+                    <button type="submit" class="connect-button">Connect</button>
+                </form>
+            </section>
+
+            <section class="panel controls-panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-kicker">02 / PERSONALIZE</span>
+                        <h2>Feed controls</h2>
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <button class="filter-button active" data-platform="twitch" type="button"><span class="chip-dot"></span>Twitch</button>
+                    <button class="filter-button active" data-platform="youtube" type="button"><span class="chip-dot"></span>YouTube</button>
+                    <button class="filter-button active" data-platform="kick" type="button"><span class="chip-dot"></span>Kick</button>
+                    <button class="filter-button active" data-platform="tiktok" type="button"><span class="chip-dot"></span>TikTok</button>
+                </div>
+                <div class="panel-header">
+                    <div>
+                        <span class="section-kicker">DISPLAY</span>
+                        <h2>Preferences</h2>
+                    </div>
+                </div>
+                <div class="settings-rows">
+                    <div class="settings-row">
+                        <span class="settings-label">Platform</span>
+                        <button id="toggle-platform" class="switch" type="button"
+                            title="Show platform icon in messages"></button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">User badges</span>
+                        <button id="toggle-badges" class="switch" type="button"
+                            title="Show user badges (mod, sub, VIP...) in messages"></button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">7TV/BTTV/FFZ emotes</span>
+                        <button id="toggle-emotes" class="switch" type="button"
+                            title="Show 7TV / BTTV / FFZ emotes in Twitch messages"></button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">Highlight mentions</span>
+                        <button id="toggle-mentions" class="switch" type="button"
+                            title="Highlight messages that @-mention a connected channel"></button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">24-hour clock</span>
+                        <button id="toggle-clock" class="switch" type="button"
+                            title="Use 24-hour time format"></button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">Text size <span id="font-size-value"
+                                class="font-size-value">16px</span></span>
+                        <input id="font-size" class="font-slider" type="range" min="12" max="24" step="1" value="16"
+                            title="Chat text size">
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">Alert sounds</span>
+                        <button id="alerts-edit" class="alerts-edit" type="button"
+                            title="Add alert sound overlays (StreamElements etc.)">+ Add</button>
+                    </div>
+                    <div id="alerts-editor" class="alerts-editor hidden">
+                        <div id="alerts-rows" class="alerts-rows"></div>
+                        <div class="alerts-actions">
+                            <button id="alerts-add-row" class="alerts-add-row" type="button">+ Add another</button>
+                            <button id="alerts-apply" class="alerts-apply" type="button">Apply</button>
+                        </div>
+                        <p class="alerts-hint">Alert overlay URLs (StreamElements etc.) play their sound in the
+                            expanded chat. Stored only in this browser.</p>
+                    </div>
+                    <button id="clear-messages" class="settings-action" type="button">Clear chat</button>
+                </div>
+            </section>
+
+            <section class="panel status-panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-kicker">CONNECTIONS</span>
+                        <h2>Platform status</h2>
+                    </div>
+                </div>
+                <div id="status-grid" class="status-grid"></div>
+            </section>
+
+            </div>
+
+            <section class="panel feed-panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-kicker">03 / LIVE ACTIVITY</span>
+                        <h2>All chats</h2>
+                    </div>
+                    <div class="feed-header-actions">
+                    <button id="copy-dock-link" class="ghost-button small-button" type="button"
+                        title="Copy this transparent chat overlay URL to paste into OBS">Copy OBS link</button>
+                    <button id="expand-toggle" class="ghost-button small-button" type="button"
+                        title="Expand the chat to fill the window">
+                        <svg viewBox="0 0 448 512" aria-hidden="true"><path fill="currentColor" d="M32 32C14.3 32 0 46.3 0 64v96c0 17.7 14.3 32 32 32s32-14.3 32-32V96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H64v-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32h64v64c0 17.7 14.3 32 32 32s32-14.3 32-32V64c0-17.7-14.3-32-32-32h-96zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v64h-64c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32v-96z"/></svg>
+                        Expand</button>
+                    </div>
+                </div>
+                <div id="obs-link-result" class="obs-link-result" hidden>
+                        <label for="obs-link-value">OBS Browser Source URL</label>
+                        <input id="obs-link-value" type="text" readonly spellcheck="false"
+                            aria-label="OBS Browser Source URL">
+                        <span id="obs-link-status" role="status" aria-live="polite"></span>
+                </div>
+                <div id="hype-train-bar" class="hype-train-bar hidden" role="status" aria-live="polite"
+                    aria-hidden="true">
+                    <div class="hype-train-info">
+                        <span class="hype-train-label">Hype Train Lvl <span id="ht-level">1</span></span>
+                        <span id="ht-progress-text"></span>
+                    </div>
+                    <div class="hype-train-track">
+                        <div id="ht-fill" class="hype-train-fill"></div>
+                    </div>
+                </div>
+                <div class="feed-wrapper">
+                    <div id="feed" class="feed" aria-live="polite"></div>
+                    <button id="scroll-bottom" class="scroll-bottom hidden" type="button" title="Scroll to bottom">&darr;</button>
+                </div>
+            </section>
+        </main>
+        <div class="player-controls">
+            <div id="player-sources" class="player-sources hidden"></div>
+            <button id="player-toggle" class="player-toggle" type="button" title="Show stream player">&#9654;</button>
+            <button id="expand-exit" class="player-toggle expand-exit" type="button" title="Collapse the chat (Esc)">&#x2715;</button>
+        </div>
+        <div id="alert-frames" class="alert-frames" aria-hidden="true"></div>
+    </div>
+
+    <div id="info-overlay" class="info-overlay hidden">
+        <div class="info-dialog panel" role="dialog" aria-modal="true" aria-labelledby="info-title">
+            <div class="info-header">
+                <h2 id="info-title">Tips &amp; tricks</h2>
+                <button id="close-info" class="info-close" type="button" title="Close">&#x2715;</button>
+            </div>
+            <div class="info-body">
+                <section>
+                    <h3>Connect</h3>
+                    <ul>
+                        <li>Type channel names, press <strong>Enter</strong> or <strong>Connect</strong></li>
+                        <li>The red &#x2715; disconnects that platform</li>
+                        <li>Your channels are saved &mdash; and live in the page URL</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>Expand</h3>
+                    <ul>
+                        <li><strong>Expand</strong> (top right) fills the window with the chat</li>
+                        <li><strong>&#x2715;</strong> or <strong>Esc</strong> brings the page back</li>
+                        <li>Bookmark or share the URL while expanded &mdash; it opens straight into it</li>
+                        <li>Install the site as an app (browser address bar) &mdash; it opens with your last used
+                            channels</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>Watch the stream</h3>
+                    <ul>
+                        <li>When expanded, press <strong>&#9654;</strong> (top right) &mdash; starts muted</li>
+                        <li>Click the platform icons to switch source</li>
+                        <li>YouTube appears once the channel is live</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>Alert sounds</h3>
+                    <ul>
+                        <li>Settings &rarr; Alert sounds: paste your alert overlay URL (StreamElements etc.) &mdash;
+                            its sound plays in the expanded chat</li>
+                        <li>Click <strong>&#128266; Enable alert sound</strong> once per visit (browser rule)</li>
+                        <li>Alert URLs stay in this browser &mdash; they are never part of the page link</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>OBS overlay</h3>
+                    <ul>
+                        <li>Click <strong>Copy OBS link</strong> above the chat feed, then paste it into the URL
+                            field of an OBS Browser Source</li>
+                        <li>Transparent background &mdash; chat floats right on the stream image</li>
+                        <li>Messages fade out after 60 s; <strong>&amp;fade=120</strong> changes the lifetime, <strong>&amp;fade=0</strong> never fades</li>
+                        <li>Tune it: <strong>&amp;size=20</strong> (text px), <strong>&amp;align=right</strong>,
+                            <strong>&amp;max=10</strong> (message count), <strong>&amp;icons=0</strong> (hide
+                            platform icons)</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>Good to know</h3>
+                    <ul>
+                        <li>Twitch badges and 7TV/BTTV/FFZ emotes show automatically &mdash; toggle them in
+                            Settings</li>
+                        <li>Messages that @-mention a connected channel are highlighted</li>
+                        <li>Filter chips hide platforms in your view only</li>
+                        <li>Deleted messages stay, with a strikethrough</li>
+                        <li>The feed keeps the latest 200 messages</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js?v=20261015-obs-copy" defer></script>
+</body>
+</html>

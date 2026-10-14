@@ -1,0 +1,63 @@
+name: Build macOS packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: macOS ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x86_64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install application and packaging dependencies
+        run: python -m pip install --disable-pip-version-check -r server/requirements.txt "pyinstaller>=6.18,<7"
+
+      - name: Build application folder
+        run: |
+          python -m PyInstaller \
+            --noconfirm \
+            --clean \
+            --onedir \
+            --name CjChatBot \
+            --add-data "$GITHUB_WORKSPACE/web:web" \
+            --collect-all TikTokLive \
+            --collect-all TikTokLiveProto \
+            --distpath dist \
+            --specpath build/pyinstaller \
+            --workpath build/pyinstaller \
+            packaging/launcher.py
+
+      - name: Assemble client package
+        run: |
+          cp LICENSE README.md packaging/Start-CjChatBot.command dist/CjChatBot/
+          chmod +x dist/CjChatBot/Start-CjChatBot.command
+          ditto -c -k --sequesterRsrc --keepParent dist/CjChatBot "CjChatBot-macOS-${{ matrix.arch }}.zip"
+
+      - name: Upload macOS package
+        uses: actions/upload-artifact@v4
+        with:
+          name: CjChatBot-macOS-${{ matrix.arch }}
+          path: CjChatBot-macOS-${{ matrix.arch }}.zip
+          if-no-files-found: error
+          retention-days: 30

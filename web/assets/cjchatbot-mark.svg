@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">CjChatBot</title>
+  <defs>
+    <linearGradient id="bubble" x1="96" y1="76" x2="420" y2="438" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#53efd0"/>
+      <stop offset="1" stop-color="#7772ff"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="132" y1="124" x2="358" y2="362" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="124" fill="#0b1020"/>
+  <path d="M129 99h254c39 0 70 31 70 70v124c0 39-31 70-70 70h-98l-98 75 15-75h-73c-39 0-70-31-70-70V169c0-39 31-70 70-70Z" fill="url(#bubble)"/>
+  <path d="M129 99h254c39 0 70 31 70 70v77c-41 35-96 56-156 56-93 0-174-50-211-124v-9c0-39 31-70 70-70Z" fill="url(#shine)"/>
+  <circle cx="198" cy="231" r="19" fill="#0b1020"/>
+  <circle cx="314" cy="231" r="19" fill="#0b1020"/>
+  <path d="M194 288c19 19 43 29 62 29s43-10 62-29" fill="none" stroke="#0b1020" stroke-linecap="round" stroke-width="16"/>
+  <circle cx="383" cy="119" r="18" fill="#ffbc70"/>
+</svg>

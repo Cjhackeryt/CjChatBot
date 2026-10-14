@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#000000">
+    <title>CjChatBot - Popout</title>
+    <!-- Satellite page: shouldn't compete with the main page in search results. -->
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href="assets/cjchatbot-mark.svg">
+    <link rel="icon" href="assets/favicon.ico" sizes="any">
+    <link rel="manifest" href="popout-manifest.json">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="stylesheet" href="styles.css?v=20261015-obs-copy">
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            padding: 0;
+        }
+        .app-shell {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: none;
+        }
+        .feed-panel {
+            flex: 1;
+            min-height: 0;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            border-radius: 0;
+            border: none;
+        }
+        .feed {
+            flex: 1 1 0;
+            min-height: 0;
+        }
+    </style>
+</head>
+<body data-mode="popout">
+    <div class="app-shell">
+        <button id="alerts-unlock" class="alerts-unlock hidden" type="button"
+            title="Browsers block sound until you interact with the page">&#128266; Enable alert sound</button>
+        <div id="player-pane" class="player-pane hidden">
+            <div id="player-frame" class="player-frame"></div>
+        </div>
+        <section class="panel feed-panel">
+            <div id="hype-train-bar" class="hype-train-bar hidden" role="status" aria-live="polite"
+                aria-hidden="true">
+                <div class="hype-train-info">
+                    <span class="hype-train-label">Hype Train Lvl <span id="ht-level">1</span></span>
+                    <span id="ht-progress-text"></span>
+                </div>
+                <div class="hype-train-track">
+                    <div id="ht-fill" class="hype-train-fill"></div>
+                </div>
+            </div>
+            <div class="feed-wrapper">
+                <div id="feed" class="feed" aria-live="polite"></div>
+                <button id="scroll-bottom" class="scroll-bottom hidden" type="button" title="Scroll to bottom">&darr;</button>
+            </div>
+        </section>
+        <div class="player-controls">
+            <div id="player-sources" class="player-sources hidden"></div>
+            <button id="player-toggle" class="player-toggle" type="button" title="Show stream player">&#9654;</button>
+        </div>
+        <div id="alert-frames" class="alert-frames" aria-hidden="true"></div>
+    </div>
+
+    <script src="app.js?v=20261015-obs-copy" defer></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+websockets
+curl_cffi
+httpx[socks]
+TikTokLive>=7.0.1

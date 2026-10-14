@@ -1,0 +1,9 @@
+services:
+  cjchatbot:
+    build: .
+    container_name: cjchatbot
+    restart: unless-stopped
+    environment:
+      TIKTOK_PROXY: ${TIKTOK_PROXY:-}
+    ports:
+      - "8100:8000"
