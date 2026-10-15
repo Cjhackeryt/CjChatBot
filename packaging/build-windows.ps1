@@ -30,14 +30,20 @@ try {
         throw "PyInstaller failed to build CjChatBot."
     }
 
-    Copy-Item LICENSE dist\CjChatBot\LICENSE -Force
-    Copy-Item README.md dist\CjChatBot\README.md -Force
-    Copy-Item packaging\Start-CjChatBot.bat dist\CjChatBot\Start-CjChatBot.bat -Force
-    Compress-Archive -Path dist\CjChatBot -DestinationPath dist\CjChatBot-Windows.zip -Force
+    Copy-Item LICENSE, README.md, packaging\Start-CjChatBot.bat -Destination dist\CjChatBot -Force
+    $compiler = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+    if (-not $compiler) {
+        throw "Inno Setup is required to create the Windows installer. Install it from https://jrsoftware.org/isdl.php and ensure ISCC.exe is on PATH."
+    }
+
+    & $compiler.Source packaging\CjChatBot.iss
+    if ($LASTEXITCODE -ne 0) {
+        throw "Inno Setup failed to build the Windows installer."
+    }
+
     Write-Host ""
-    Write-Host "Build complete: $projectRoot\dist\CjChatBot\CjChatBot.exe"
-    Write-Host "Client package: $projectRoot\dist\CjChatBot-Windows.zip"
-    Write-Host "Share the ZIP with your client; do not send only the EXE."
+    Write-Host "Windows installer: $projectRoot\dist\CjChatBot-Setup.exe"
+    Write-Host "Share the installer EXE with your client."
 }
 finally {
     Pop-Location

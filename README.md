@@ -26,15 +26,12 @@ Python 3.12 or newer must be installed.
 ### Build a Windows app for sharing
 
 On your development PC, run [`packaging/build-windows.ps1`](packaging/build-windows.ps1)
-in PowerShell after setting up the project once. It builds a self-contained
-one-folder Windows app at `dist/CjChatBot/`. Share the **entire folder** with
-your client, or send the generated `dist/CjChatBot-Windows.zip`. They can
-extract the ZIP completely, then run `Start-CjChatBot.bat` (or
-`CjChatBot.exe`) without installing Python. Do not run it from inside the ZIP
-or copy out only the EXE; the `_internal` folder beside it contains the
-bundled runtime and application files. The app opens in their browser and
-stores its connection statistics under their local AppData folder. If startup
-fails, the console remains open and details are saved to
+in PowerShell after setting up the project once and installing Inno Setup. It
+builds `dist/CjChatBot-Setup.exe`, a Windows installer that includes the app
+and its bundled runtime. Your client can run the installer without installing
+Python, then start CjChatBot from its shortcut. The app opens in their browser
+and stores its connection statistics under their local AppData folder. If
+startup fails, the console remains open and details are saved to
 `%LOCALAPPDATA%\CjChatBot\startup-error.log`.
 
 The package includes the project license. Packaging is not code encryption:
@@ -43,18 +40,18 @@ bundled Python bytecode and browser assets can still be inspected.
 ### Build a macOS app for sharing
 
 After this project is pushed to its GitHub repository, GitHub Actions builds
-the macOS packages on native macOS runners. Run the **Build macOS packages**
-workflow from that repository's Actions tab, or push a version tag beginning
-with `v`. Download the two workflow artifacts from the completed run:
-`CjChatBot-macOS-arm64` is for Apple Silicon Macs (M1 and later), and
-`CjChatBot-macOS-x86_64` is for Intel Macs. Each artifact contains a ZIP and
-is retained by GitHub for 30 days.
+the release packages on native Windows and macOS runners. Run the
+**Build release packages** workflow from the repository's Actions tab to get
+temporary artifacts, or push a version tag beginning with `v` to publish
+downloadable files on the GitHub Releases page. The Windows download is
+`CjChatBot-Setup.exe`. The macOS disk images are
+`CjChatBot-macOS-arm64.dmg` for Apple Silicon Macs (M1 and later) and
+`CjChatBot-macOS-x86_64.dmg` for Intel Macs.
 
-On the client's Mac, extract the ZIP fully, open the resulting `CjChatBot`
-folder, and double-click `Start-CjChatBot.command`. Keep the Terminal window
-open while using the app. The executable needs the `_internal` folder beside
-it and cannot be run by itself. App data and startup diagnostics are stored
-under `~/Library/Application Support/CjChatBot`.
+On the client's Mac, open the matching DMG, then double-click
+`Start-CjChatBot.command` inside the mounted image. Keep the Terminal window
+open while using the app. App data and startup diagnostics are stored under
+`~/Library/Application Support/CjChatBot`.
 
 These builds are not signed or notarized with an Apple Developer identity, so
 macOS may block the first launch. If Gatekeeper warns, Control-click
