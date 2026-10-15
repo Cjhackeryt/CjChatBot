@@ -80,7 +80,16 @@ jobs:
           python-version: "3.12"
 
       - name: Install Inno Setup
-        run: choco install innosetup --no-progress --yes
+        shell: pwsh
+        run: |
+          $innoSetup = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6"
+          if (-not (Test-Path (Join-Path $innoSetup "ISCC.exe"))) {
+            choco install innosetup --no-progress --yes
+          }
+          if (-not (Test-Path (Join-Path $innoSetup "ISCC.exe"))) {
+            throw "Inno Setup was not installed successfully."
+          }
+          $innoSetup | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Install application and packaging dependencies
         run: python -m pip install --disable-pip-version-check -r server/requirements.txt "pyinstaller>=6.18,<7"
