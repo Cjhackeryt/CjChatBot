@@ -13,6 +13,7 @@ import asyncio
 import logging
 import os
 import random
+import ssl
 import time
 
 import httpx
@@ -39,6 +40,7 @@ except Exception:  # library layout changed — fall back to generic handling
         pass
 
 from ..models import Message
+from ..tls import create_ssl_context
 
 # TikTok's edge 403s non-US requests carrying the library's default
 # datacenter cookie; drop it and let TikTok route by IP.
@@ -51,6 +53,7 @@ except Exception:
 logger = logging.getLogger(__name__)
 
 OFFLINE_RECHECK_SECONDS = 60
+TIKTOK_SSL_CONTEXT = create_ssl_context()
 
 
 def _describe_error(exc: Exception) -> str:
@@ -73,6 +76,17 @@ def _is_connection_error(exc: Exception) -> bool:
     seen: set[int] = set()
     while current is not None and id(current) not in seen:
         if isinstance(current, (httpx.ConnectError, httpx.ProxyError)):
+            return True
+        seen.add(id(current))
+        current = current.__cause__ or current.__context__
+    return False
+
+
+def _is_certificate_error(exc: Exception) -> bool:
+    current: BaseException | None = exc
+    seen: set[int] = set()
+    while current is not None and id(current) not in seen:
+        if isinstance(current, ssl.SSLCertVerificationError):
             return True
         seen.add(id(current))
         current = current.__cause__ or current.__context__
@@ -121,6 +135,8 @@ class TikTokChat:
                     unique_id=f"@{name.lstrip('@')}",
                     web_proxy=proxy,
                     ws_proxy=proxy,
+                    web_kwargs={"httpx_kwargs": {"verify": TIKTOK_SSL_CONTEXT}},
+                    ws_kwargs={"ssl": TIKTOK_SSL_CONTEXT},
                 )
                 self._register_handlers(client, name)
                 await client.connect()  # runs until the stream/connection ends
@@ -156,7 +172,9 @@ class TikTokChat:
                 if client is not None:
                     await self._teardown(client)
                 detail = _describe_error(exc)
-                if _is_connection_error(exc):
+                if _is_certificate_error(exc):
+                    detail += " — trust your network's root CA using CJCHATBOT_CA_BUNDLE"
+                elif _is_connection_error(exc):
                     detail += " — check TikTok network access or configure TIKTOK_PROXY"
                 logger.warning("tiktok error for %s: %s", name, detail, exc_info=True)
                 await self.hub.publish_status(

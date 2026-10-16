@@ -10,15 +10,14 @@ import asyncio
 import logging
 import random
 import re
-import ssl
 import time
 
-import certifi
 import websockets
 from curl_cffi.requests import AsyncSession
 
 from ..hypetrain import HypeTrainPoller
 from ..models import Message, prefix_text as _prefix_text
+from ..tls import create_ssl_context
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +25,7 @@ TWITCH_IRC_URL = "wss://irc-ws.chat.twitch.tv:443"
 GQL_URL = "https://gql.twitch.tv/gql"
 GQL_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"  # Twitch's own web client (anonymous)
 
-TWITCH_SSL_CONTEXT = ssl.create_default_context()
-TWITCH_SSL_CONTEXT.load_verify_locations(cafile=certifi.where())
+TWITCH_SSL_CONTEXT = create_ssl_context()
 
 TAG_ESCAPES = {"\\:": ";", "\\s": " ", "\\\\": "\\", "\\r": "\r", "\\n": "\n"}
 TAG_ESCAPE_RE = re.compile(r"\\[:s\\rn]")

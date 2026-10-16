@@ -25,8 +25,11 @@ import websockets
 from curl_cffi.requests import AsyncSession
 
 from ..models import Message
+from ..tls import create_ssl_context
 
 logger = logging.getLogger(__name__)
+
+KICK_SSL_CONTEXT = create_ssl_context()
 
 PUSHER_URL = "wss://ws-{cluster}.pusher.com/app/{app_key}?protocol=7&client=js&version=8.4.0-rc2&flash=false"
 PUSHER_CONFIG_URL = "https://web.kick.com/api/v1/realtime/connection"
@@ -216,7 +219,8 @@ class KickChat:
             try:
                 app_key, cluster = self._pusher_config
                 async with websockets.connect(
-                    PUSHER_URL.format(app_key=app_key, cluster=cluster)
+                    PUSHER_URL.format(app_key=app_key, cluster=cluster),
+                    ssl=KICK_SSL_CONTEXT,
                 ) as ws:
                     self._ws = ws
                     for slug in list(self.rooms):

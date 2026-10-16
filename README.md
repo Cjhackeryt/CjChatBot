@@ -87,7 +87,29 @@ service; TLS or network failures are shown in the platform status detail and
 retried automatically. If TikTok is blocked on your network, connect through
 a VPN that allows TikTok, or set `TIKTOK_PROXY` to an HTTP or SOCKS5 proxy
 that supports both HTTPS requests and WebSockets before starting CjChatBot.
-For example, in PowerShell:
+Twitch, Kick and TikTok TLS connections verify certificates using the system
+trust store and the `certifi` CA bundle. If your network uses HTTPS inspection,
+get its trusted root CA certificate from your administrator in PEM format and set
+`CJCHATBOT_CA_BUNDLE` to its file path before starting CjChatBot. On macOS,
+run the launcher from Terminal:
+
+```bash
+export CJCHATBOT_CA_BUNDLE="/path/to/trusted-root.pem"
+./Start-CjChatBot.command
+```
+
+On Windows, set it in PowerShell:
+
+```powershell
+$env:CJCHATBOT_CA_BUNDLE = "C:\path\to\trusted-root.pem"
+.\run-cjchatbot.bat
+```
+
+Do not disable certificate verification. If you do not use an inspecting proxy,
+check that your system clock is correct and that your network is not replacing
+TikTok's certificates.
+
+To use a proxy, set `TIKTOK_PROXY` before starting. For example, in PowerShell:
 
 ```powershell
 $env:TIKTOK_PROXY = "http://127.0.0.1:8080"
