@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-macos:
-    name: macOS DMG (${{ matrix.arch }})
+    name: macOS ZIP (${{ matrix.arch }})
     strategy:
       fail-fast: false
       matrix:
@@ -48,22 +48,19 @@ jobs:
             --workpath build/pyinstaller \
             packaging/launcher.py
 
-      - name: Create macOS disk image
+      - name: Create macOS ZIP
         run: |
           cp LICENSE README.md packaging/Start-CjChatBot.command dist/CjChatBot/
           chmod +x dist/CjChatBot/Start-CjChatBot.command
-          hdiutil create \
-            -volname CjChatBot \
-            -srcfolder dist/CjChatBot \
-            -ov \
-            -format UDZO \
-            "CjChatBot-macOS-${{ matrix.arch }}.dmg"
+          ditto -c -k --sequesterRsrc --keepParent \
+            dist/CjChatBot \
+            "CjChatBot-macOS-${{ matrix.arch }}.zip"
 
-      - name: Upload macOS disk image
+      - name: Upload macOS ZIP
         uses: actions/upload-artifact@v4
         with:
           name: CjChatBot-macOS-${{ matrix.arch }}
-          path: CjChatBot-macOS-${{ matrix.arch }}.dmg
+          path: CjChatBot-macOS-${{ matrix.arch }}.zip
           if-no-files-found: error
           retention-days: 30
 

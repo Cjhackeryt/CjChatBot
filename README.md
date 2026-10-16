@@ -44,14 +44,14 @@ the release packages on native Windows and macOS runners. Run the
 **Build release packages** workflow from the repository's Actions tab to get
 temporary artifacts, or push a version tag beginning with `v` to publish
 downloadable files on the GitHub Releases page. The Windows download is
-`CjChatBot-Setup.exe`. The macOS disk images are
-`CjChatBot-macOS-arm64.dmg` for Apple Silicon Macs (M1 and later) and
-`CjChatBot-macOS-x86_64.dmg` for Intel Macs.
+`CjChatBot-Setup.exe`. The macOS ZIP files are
+`CjChatBot-macOS-arm64.zip` for Apple Silicon Macs (M1 and later) and
+`CjChatBot-macOS-x86_64.zip` for Intel Macs.
 
-On the client's Mac, open the matching DMG, then double-click
-`Start-CjChatBot.command` inside the mounted image. Keep the Terminal window
-open while using the app. App data and startup diagnostics are stored under
-`~/Library/Application Support/CjChatBot`.
+On the client's Mac, extract the matching ZIP, then double-click
+`Start-CjChatBot.command` inside the extracted `CjChatBot` folder. Keep the
+Terminal window open while using the app. App data and startup diagnostics are
+stored under `~/Library/Application Support/CjChatBot`.
 
 These builds are not signed or notarized with an Apple Developer identity, so
 macOS may block the first launch. If Gatekeeper warns, Control-click
