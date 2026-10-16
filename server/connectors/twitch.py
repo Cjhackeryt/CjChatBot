@@ -10,8 +10,10 @@ import asyncio
 import logging
 import random
 import re
+import ssl
 import time
 
+import certifi
 import websockets
 from curl_cffi.requests import AsyncSession
 
@@ -23,6 +25,9 @@ logger = logging.getLogger(__name__)
 TWITCH_IRC_URL = "wss://irc-ws.chat.twitch.tv:443"
 GQL_URL = "https://gql.twitch.tv/gql"
 GQL_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"  # Twitch's own web client (anonymous)
+
+TWITCH_SSL_CONTEXT = ssl.create_default_context()
+TWITCH_SSL_CONTEXT.load_verify_locations(cafile=certifi.where())
 
 TAG_ESCAPES = {"\\:": ";", "\\s": " ", "\\\\": "\\", "\\r": "\r", "\\n": "\n"}
 TAG_ESCAPE_RE = re.compile(r"\\[:s\\rn]")
@@ -139,7 +144,9 @@ class TwitchChat:
     async def _run(self) -> None:
         while self.channels:
             try:
-                async with websockets.connect(TWITCH_IRC_URL) as ws:
+                async with websockets.connect(
+                    TWITCH_IRC_URL, ssl=TWITCH_SSL_CONTEXT
+                ) as ws:
                     self._ws = ws
                     await ws.send("CAP REQ :twitch.tv/tags twitch.tv/commands")
                     await ws.send(f"NICK justinfan{random.randint(10000, 99999)}")

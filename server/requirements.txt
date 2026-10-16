@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 websockets
+certifi
 curl_cffi
 httpx[socks]
 TikTokLive>=7.0.1

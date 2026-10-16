@@ -103,6 +103,11 @@ $env:TIKTOK_PROXY = "http://host.docker.internal:8080"
 docker compose up --build -d
 ```
 
+Twitch IRC uses the host's trusted certificates plus the `certifi` CA bundle,
+including in the packaged macOS app. If a managed network or HTTPS-inspecting
+proxy still causes a Twitch certificate error, its root CA must be trusted by
+macOS; do not disable certificate verification.
+
 ## Features
 
 - **Unified feed** — up to four chats in one view, with per-platform filters,
